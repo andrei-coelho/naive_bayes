@@ -1,8 +1,8 @@
 import mysql.connector
 from mysql.connector import Error
-from libs import config
+from util.config import Config
 
-database = config.Config.instance().getDataBase()
+database = Config.instance().getDataBase()
 
 class mysqli:
     _instance = None

@@ -34,12 +34,10 @@ Utilizado para o cálculo do TF-IDF
 ```json
 {
     "total_registros":1000,
-    "palavras":[
-        {
-            "palavra":"palavra_exemplo",
-            "total":2000
-        }
-    ]
+    "palavras":{
+      "palavra_1":200,
+      "palavra_2":200,
+    }
 }
 ```
 
