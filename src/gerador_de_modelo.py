@@ -1,7 +1,10 @@
 from collections import Counter
+
 from util.manage_files import write, read
 from util.mysqli import mysqli
 from util.tokenizer import tokenizer
+
+from src.modelo_classificador import categorizar
 
 import random
 import math
@@ -159,10 +162,7 @@ def gerarTabelaProbabilidade(categorias:dict, tfidf, total_rows:int):
     
     return tabela if write('tf_idf', TF_IDF_filtrado) and write('prob', tabela) else False
 
-    
 
-def test(text:str, categoria:str):
-    pass
 
 def training():
 
@@ -173,15 +173,26 @@ def training():
     random.shuffle(rows)
 
     split_point   = int(0.8 * len(rows))
-    training_data = results[:split_point]
-    testing_data  = results[split_point:]
+    training_data = rows[:split_point]
+    testing_data  = rows[split_point:]
     
     categorias = genCategoriasPalavras(training_data)
     tfidf      = genTFIDF(categorias)
 
-    tabela     = gerarTabelaProbabilidade(categorias, tfidf, len(training_data))
-
+    gerarTabelaProbabilidade(categorias, tfidf, len(training_data))
     
+    lista_test = []
 
+    for data in testing_data:
+        lista_test.append(categorizar(data['nome']) == data['categoria'])
 
+    total = len(lista_test)
     
+    qtd_true  = sum(lista_test) 
+    qtd_false = total - qtd_true 
+
+    porcentagem_true  = (qtd_true  / total) * 100
+    porcentagem_false = (qtd_false / total) * 100
+
+    print(f"Acertos: {porcentagem_true}%")
+    print(f"Erros: {porcentagem_false}%")

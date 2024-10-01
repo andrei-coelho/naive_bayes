@@ -13,7 +13,7 @@ def categorizar(text:str):
     for categoria in categorias:
         score = model['p_categorias'][categoria]
         for palavra, valor in model['p_palavras'][categoria].items():
-            score *= tokens[palavra] * valor if palavra in tokens else valor
+            score *= tokens[palavra] * valor * 2 if palavra in tokens else 1
         test[categoria] = score
 
     categoria_final = ""
