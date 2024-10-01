@@ -1,0 +1,18 @@
+{
+    "categoria1": {
+        "palavra3": 2.0,
+        "palavra1": 1.0,
+        "palavra2": 0.6666666666666666
+    },
+    "categoria2": {
+        "palavra2": 2.0,
+        "palavra1": 0.6666666666666666,
+        "palavra4": 0.5
+    },
+    "categoria3": {
+        "palavra3": 0.75,
+        "palavra4": 0.75,
+        "palavra1": 0.25,
+        "palavra2": 0.25
+    }
+}

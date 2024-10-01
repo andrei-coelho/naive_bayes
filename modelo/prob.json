@@ -1,0 +1,27 @@
+{
+    "p_categorias": {
+        "categoria1": 0.375,
+        "categoria2": 0.375,
+        "categoria3": 0.25
+    },
+    "p_palavras": {
+        "categoria1": {
+            "palavra3": 1.2992829841302609,
+            "palavra1": 0.6931471805599453,
+            "palavra2": 0.36772478012531734,
+            "palavra4": 0.01
+        },
+        "categoria2": {
+            "palavra3": 0.01,
+            "palavra1": 0.36772478012531734,
+            "palavra2": 1.6094379124341003,
+            "palavra4": 0.15415067982725836
+        },
+        "categoria3": {
+            "palavra3": 0.5596157879354227,
+            "palavra1": 0.11778303565638346,
+            "palavra2": 0.11778303565638346,
+            "palavra4": 0.5596157879354227
+        }
+    }
+}

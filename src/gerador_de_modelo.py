@@ -1,28 +1,10 @@
 from collections import Counter
-from src.manage_files import write, read
+from util.manage_files import write, read
 from util.mysqli import mysqli
+from util.tokenizer import tokenizer
 
+import random
 import math
-import unicodedata
-
-
-stop_words = [
-    "a", "ao", "aos", "aonde", "aquelas", "aquele", "aqueles", "aqui",
-    "as", "assim", "com", "como", "da", "das", "de", "delas", "dele",
-    "deles", "depois", "desde", "do", "dos", "e", "em", "entre", "era",
-    "esse", "essa", "esses", "essas", "eu", "havia", "ha", "i", "isso",
-    "isto", "ja", "la", "lhe", "lhes", "me", "meu", "meus", "na", "nas",
-    "naquilo", "nao", "nem", "nas", "nisto", "nada", "nos", "o", "os",
-    "outro", "outros", "para", "pela", "pelas", "pelo", "pelos", "porem",
-    "que", "quem", "se", "seu", "seus", "sob", "sobre", "tanto", "tudo",
-    "um", "uma", "umas", "uns", "voce", "vos", "aonde", "adiante", "agora",
-    "ali", "alem", "antes", "entre", "enquanto", "hoje", "ja", "junto",
-    "mais", "menos", "mesmo", "nunca", "pouco", "sempre", "entao"
-]
-
-def normalize(palavra: str) -> str:
-    palavra = unicodedata.normalize('NFKD', palavra)
-    return ''.join(c for c in palavra if unicodedata.category(c) != 'Mn').lower()
 
 
 def getData():
@@ -42,21 +24,7 @@ def getData():
         print(f"Erro no banco de dados: {e}")
         return False
 
-
-def tokenizer(text:str):
-
-    palavras = text.split(" ")
-    palavras_normalizadas = []
-
-    for palavra in palavras:
-        palavra = normalize(palavra)
-        if palavra in stop_words:
-            continue
-        palavras_normalizadas.append(palavra)
     
-    return palavras_normalizadas
-
-
 def genCategoriasPalavras(rows:list):
     
     categorias:dict[list] = {}
@@ -153,6 +121,7 @@ def genTFIDF(categorias:dict):
 
     return ( TF_IDF_filtrado, TF )
 
+
 def gerarTabelaProbabilidade(categorias:dict, tfidf, total_rows:int):
     
     TF_IDF_filtrado = tfidf[0]
@@ -168,6 +137,7 @@ def gerarTabelaProbabilidade(categorias:dict, tfidf, total_rows:int):
     }
 
     for categoria in categorias_nomes:
+        tabela['p_categorias'][categoria] = len(categorias[categoria]) / total_rows
         palavras = TF_IDF_filtrado[categoria].keys()
         for palavra in palavras:
             if not palavra in palavras_index:
@@ -177,34 +147,41 @@ def gerarTabelaProbabilidade(categorias:dict, tfidf, total_rows:int):
         tot = len(categorias[categoria])
         total_docs_cat[categoria] = tot
         total_docs += tot
-
-    print(total_docs_cat)
-
-    # print(categorias)
-    # print(TF_IDF_filtrado)
-    # print(TF)
-
+  
     for categoria in categorias_nomes:
         for palavra in palavras_index:
             if not categoria in tabela['p_palavras']:
                 tabela['p_palavras'][categoria] = {}
-            if not palavra in TF[categoria]:
+            if not palavra in TF[categoria] or not palavra in TF_IDF_filtrado[categoria]:
                 tabela['p_palavras'][categoria][palavra] = 0.01
                 continue
             tabela['p_palavras'][categoria][palavra] = math.log(((TF[categoria][palavra] / total_docs_cat[categoria]) * TF_IDF_filtrado[categoria][palavra]) + 1) 
+    
+    return tabela if write('tf_idf', TF_IDF_filtrado) and write('prob', tabela) else False
 
-    print(tabela)
+    
 
+def test(text:str, categoria:str):
+    pass
 
-def genModel():
+def training():
 
     rows = getData()
-    total_rows = len(rows)
     if not rows:
         return None
 
-    categorias = genCategoriasPalavras(rows)
+    random.shuffle(rows)
 
-    print(categorias)
+    split_point   = int(0.8 * len(rows))
+    training_data = results[:split_point]
+    testing_data  = results[split_point:]
     
+    categorias = genCategoriasPalavras(training_data)
+    tfidf      = genTFIDF(categorias)
+
+    tabela     = gerarTabelaProbabilidade(categorias, tfidf, len(training_data))
+
+    
+
+
     
